@@ -1,12 +1,21 @@
+import java.io.Serializable;
+
 /**
  * Created by nicolas on 11.04.16.
  */
-public class Paquet {
+public class Paquet implements Serializable{
 
     private short persoID;
     private short actionID;
     private int posX;
     private int posY;
+
+    public Paquet(){
+        persoID = 1;
+        actionID = 2;
+        posX = 2;
+        posY = 1;
+    }
 
     public short getPersoID() {
         return persoID;
@@ -44,5 +53,10 @@ public class Paquet {
 
     public void setPosY(int posY) {
         this.posY = posY;
+    }
+
+    public String toString(){
+        return "PersoID: " + persoID + " ActionID: " + actionID + " posX: " + posX + " posY: " + posY;
+
     }
 }
