@@ -14,6 +14,7 @@ public class CommunicationThread extends Thread{
         ObjectInputStream ois;
         ObjectOutputStream oos;
         boolean running = true;
+        System.out.println("client dans la salle");
 
         try{
             while(running){

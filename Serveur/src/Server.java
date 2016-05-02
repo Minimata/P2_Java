@@ -8,21 +8,23 @@ import java.net.Socket;
 public class Server {
 
     public static int port;
-    private String in;
-    private String out;
 
-     public static void main()throws Exception{
+     public static void main(String[] args) throws Exception{
+         String out = "Connection à la salle en cours";
+         String in;
          port = 9090;
          System.out.println("Server started!");
-         Room firstRoom = new Room();
-         firstRoom.start();
          try {//redirection des connections
              ServerSocket serverSocket = new ServerSocket(port);
              Socket s = serverSocket.accept();
              DataInputStream is = new DataInputStream(s.getInputStream());
              DataOutputStream os = new DataOutputStream(s.getOutputStream());
-             System.out.println(is.readChar());
-             os.write(port);
+             in = is.readUTF();
+             System.out.println(in);
+             os.writeUTF(out);
+             os.flush();
+             Room firstRoom = new Room();
+             firstRoom.start();
          } catch (IOException e) {
              e.printStackTrace();
          }
