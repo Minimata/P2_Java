@@ -11,7 +11,8 @@ public class ClientListener extends Thread {
     private String host;
     private int port;
     private boolean infiniteLoop = true;
-    private Paquet order;
+    //private Paquet order;
+    private String order;
     private Socket socket;
 
     public ClientListener(Socket s){
@@ -25,14 +26,13 @@ public class ClientListener extends Thread {
         try {
             System.out.println("Listener started");
             while (infiniteLoop) {
-                try{
-                    ObjectInputStream scanner = new ObjectInputStream(socket.getInputStream());
-                    order = (Paquet) scanner.readObject();
-                    System.out.println(order.toString());
-                    infiniteLoop = false;
-                }catch(ClassNotFoundException e){
-                    e.printStackTrace();
-                }
+                DataInputStream scanner = new DataInputStream(socket.getInputStream());
+                order = scanner.readUTF();
+                //ObjectInputStream scanner = new ObjectInputStream(socket.getInputStream());
+                //order = (Paquet) scanner.readObject();
+                //System.out.println(order.toString());
+                System.out.println(order);
+                //infiniteLoop = false;
 
             }
         } catch (IOException e) {

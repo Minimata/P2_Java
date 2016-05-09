@@ -28,8 +28,11 @@ public class ClientSender extends Thread{
     public void run(){
         while(infiniteLoop){
             try{
-                ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
-                writer.writeObject(p);
+                DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
+                // ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
+                writer.writeUTF("Coucou");
+                writer.flush();
+                //writer.writeObject(p);
             }catch(IOException e){
                 e.printStackTrace();
             }
