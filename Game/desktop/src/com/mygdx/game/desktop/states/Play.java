@@ -1,16 +1,16 @@
 package com.mygdx.game.desktop.states;
 
-import static com.mygdx.game.desktop.handlers.B2DVars.PPM;
+import static com.mygdx.game.desktop.handlers.Utils.PPM;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.game.desktop.handlers.B2DVars;
+import com.mygdx.game.desktop.handlers.Utils;
 import com.mygdx.game.desktop.handlers.GameStateManager;
 import com.mygdx.game.desktop.handlers.MyContactListener;
 import com.mygdx.game.desktop.handlers.MyInput;
-import com.mygdx.game.desktop.main.Game;
+import com.mygdx.game.desktop.main.Player;
 
 /**
  * Created by alexandre on 09.05.2016.
@@ -22,8 +22,9 @@ public class Play extends GameState{
 
     private OrthographicCamera b2dcam;
 
-    private Body playerBody;
     private MyContactListener cl;
+
+    private Player player;
 
     public Play(GameStateManager gsm){
 
@@ -35,68 +36,54 @@ public class Play extends GameState{
 
         b2dr = new Box2DDebugRenderer();
 
-        //create Platform
+        //create World walls
+        createPlatform(Utils.V_WIDTH / 2, 5, Utils.V_WIDTH / Utils.SCALE, 5);
+        createPlatform(Utils.V_WIDTH / 2, Utils.V_HEIGHT - 5, Utils.V_WIDTH / Utils.SCALE, 5);
+        createPlatform(5, Utils.V_HEIGHT / 2, 5, Utils.V_HEIGHT / Utils.SCALE);
+        createPlatform(Utils.V_WIDTH - 5, Utils.V_HEIGHT / 2, 5, Utils.V_HEIGHT / Utils.SCALE);
+
+        //create platforms
+        createPlatform(Utils.V_WIDTH / 2, Utils.V_HEIGHT / 2, 60, 5);
+        createPlatform(30, Utils.V_HEIGHT / 4, 20, 5);
+        createPlatform(Utils.V_WIDTH - 30, Utils.V_HEIGHT / 4, 20, 5);
+
+        //create Player
+        player = new Player(world);
+
+        //set up box2d cam
+        b2dcam = new OrthographicCamera();
+        b2dcam.setToOrtho(false, Utils.V_WIDTH / PPM, Utils.V_HEIGHT / PPM);
+    }
+
+    private void createPlatform(int posX, int posY, int width, int height) {
         BodyDef bdef = new BodyDef();
-        bdef.position.set(160 / PPM, 120 / PPM);
+        bdef.position.set(posX / PPM, posY / PPM);
         bdef.type = BodyDef.BodyType.StaticBody;
         Body body = world.createBody(bdef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(50 / PPM, 5 / PPM);
+        shape.setAsBox(width / PPM, height / PPM);
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
 
-        fdef.filter.categoryBits = B2DVars.BIT_GROUND;
-        fdef.filter.maskBits = B2DVars.BIT_PLAYER;
+        fdef.filter.categoryBits = Utils.BIT_GROUND;
+        fdef.filter.maskBits = Utils.BIT_PLAYER;
         body.createFixture(fdef).setUserData("ground");
-
-        //create Player
-        bdef.position.set(160 / PPM, 200 / PPM);
-        bdef.type = BodyDef.BodyType.DynamicBody;
-        playerBody = world.createBody(bdef);
-
-        shape.setAsBox(5 / PPM, 5 / PPM);
-        fdef.shape = shape;
-        fdef.restitution = 0.0f;
-        fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND;
-        playerBody.createFixture(fdef).setUserData("player");
-
-        //create foot sensor
-        shape.setAsBox(2 / PPM, 2 / PPM, new Vector2(0, -5 / PPM), 0);
-        fdef.shape = shape;
-        fdef.filter.categoryBits = B2DVars.BIT_PLAYER;
-        fdef.filter.maskBits = B2DVars.BIT_GROUND;
-        fdef.isSensor = true;
-        playerBody.createFixture(fdef).setUserData("foot");
-
-        //set up box2d cam
-        b2dcam = new OrthographicCamera();
-        b2dcam.setToOrtho(false, Game.V_WIDTH / PPM, Game.V_HEIGHT / PPM);
     }
 
     public void handleInput(){
         //player jump
         if(MyInput.isPressed(MyInput.BUTTON_JUMP)) {
-            if(cl.isPlayerOnGround()) jumpUp(200);
+            if(cl.isPlayerOnGround()) player.jumpUp(Utils.PLAYER_JUMP_FORCE);
             else if (cl.canPlayerDoubleJump()) {
-                jumpUp(100);
+                player.jumpUp(Utils.PLAYER_JUMP_FORCE / 2);
                 cl.setDoubleJump(false);
             }
         }
 
         //player straf
-        if(MyInput.isDown(MyInput.BUTTON_RIGHT)) moveOnSide(true, 1);
-        if(MyInput.isDown(MyInput.BUTTON_LEFT)) moveOnSide(false, 1);
-    }
-
-    public void jumpUp(int force) {
-        playerBody.applyForceToCenter(0, force, true);
-    }
-
-    public void moveOnSide(boolean moveRight, int velocity) {
-        if(moveRight) playerBody.setLinearVelocity(velocity, playerBody.getLinearVelocity().y);
-        else playerBody.setLinearVelocity(-velocity, playerBody.getLinearVelocity().y);
+        if(MyInput.isDown(MyInput.BUTTON_RIGHT)) player.moveOnSide(true, Utils.PLAYER_ACCELERATION);
+        if(MyInput.isDown(MyInput.BUTTON_LEFT)) player.moveOnSide(false, Utils.PLAYER_ACCELERATION);
     }
 
     public void update(float dt){

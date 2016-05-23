@@ -4,6 +4,7 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.desktop.handlers.Utils;
 import com.mygdx.game.desktop.handlers.GameStateManager;
 import com.mygdx.game.desktop.handlers.MyInput;
 import com.mygdx.game.desktop.handlers.MyInputProcessor;
@@ -14,10 +15,6 @@ import com.mygdx.game.desktop.handlers.MyInputProcessor;
 public class Game implements ApplicationListener{
 
     public static final String TITLE = "Game Test";
-    public static final int V_WIDTH = 320;
-    public static final int V_HEIGHT = 240;
-    public static final int SCALE = 2;
-
     private static final float STEP = 1 / 60f;
     private float accum;
 
@@ -33,9 +30,9 @@ public class Game implements ApplicationListener{
 
         sb = new SpriteBatch();
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, V_WIDTH, V_HEIGHT);
+        cam.setToOrtho(false, Utils.V_WIDTH, Utils.V_HEIGHT);
         hudCam = new OrthographicCamera();
-        hudCam.setToOrtho(false, V_WIDTH, V_HEIGHT);
+        hudCam.setToOrtho(false, Utils.V_WIDTH, Utils.V_HEIGHT);
 
         gsm = new GameStateManager(this);
     }
