@@ -7,8 +7,13 @@ import java.net.Socket;
  */
 public class Room extends Thread{
 
-    private final int nbPlayers = 8;
-    ServerSocket sSocket;
+    public static ServerSocket sSocket;
+    private int port;
+
+
+    public Room(int port){
+        this.port = port;
+    }
 
     public void run(){
         String out = "connecté à la salle";
@@ -16,18 +21,25 @@ public class Room extends Thread{
         //Room r = new Room();
         //r.start();
         try {
-            sSocket = new ServerSocket(Server.port);
-            while(i<nbPlayers) {
-                Socket socket = sSocket.accept();
-                DataOutputStream os = new DataOutputStream(socket.getOutputStream());
-                os.writeUTF(out);
-                os.flush();
-                Thread t = new CommunicationThread(socket);
-                t.start();
-                i++;
-            }
             System.out.println("Room started!");
-            Server.port++;
+            sSocket = new ServerSocket(port);
+            while(true) {
+                try {
+                    //System.out.println("passe");
+                    Socket socket = sSocket.accept();
+                    DataOutputStream os = new DataOutputStream(socket.getOutputStream());
+                    System.out.println("test" + socket.getLocalPort());
+                    os.writeUTF(out);
+                    os.flush();
+                    Thread t = new CommunicationThread(socket);
+                    t.start();
+                    i++;
+
+                }
+                catch (IOException e){
+                    e.printStackTrace();
+                }
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
