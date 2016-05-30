@@ -18,12 +18,6 @@ public class Main {
     public static void main(String[] args) {
         port = 0;
         if(initiateConnection()){
-           /* try{
-                sleep(1000);
-            }catch(InterruptedException e){
-                e.printStackTrace();
-            }*/
-
             createNetwork();
         }
 
@@ -47,11 +41,12 @@ public class Main {
 
     public static void createNetwork(){
         try{
+            Paquet p = new Paquet();
             System.out.println("Creation du socket !");
             Socket socket = new Socket(host, port);
             ClientListener c = new ClientListener(socket);
             c.start();
-            ClientSender d = new ClientSender(socket);
+            ClientSender d = new ClientSender(socket, p);
             d.start();
         }catch(IOException e){
             e.printStackTrace();

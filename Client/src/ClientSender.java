@@ -15,24 +15,30 @@ public class ClientSender extends Thread{
     private boolean infiniteLoop;
     private Socket socket;
     private Paquet p;
+    private ObjectOutputStream writer;
 
-    public ClientSender(Socket s){
+    public ClientSender(Socket s, Paquet p ){
         System.out.println("Creation du sender !");
         socket = s;
         host = "localhost";
         port = 9090;
         infiniteLoop = true;
-        p = new Paquet();
+        this.p = p;
     }
 
     public void run(){
+        int i = 0;
         while(infiniteLoop){
             try{
-                DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
-                // ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
-                writer.writeUTF("Coucou");
-                writer.flush();
+                //DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
+                if(i == 0){
+                    writer = new ObjectOutputStream(socket.getOutputStream());
+                    writer.writeObject(p);
+                    writer.flush();
+                    i++;
+                }
                 //writer.writeObject(p);
+                //infiniteLoop = false;
             }catch(IOException e){
                 e.printStackTrace();
             }

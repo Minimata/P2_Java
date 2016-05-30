@@ -57,6 +57,5 @@ public class Paquet implements Serializable{
 
     public String toString(){
         return "PersoID: " + persoID + " ActionID: " + actionID + " posX: " + posX + " posY: " + posY;
-
     }
 }
