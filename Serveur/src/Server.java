@@ -12,7 +12,7 @@ public class Server {
 
     public static int port;
     public static int portBase;
-    private final static int nbPlayers = 8;
+    public final static int nbPlayers = 2;
 
      public static void main(String[] args) throws Exception{
          int i=0;
@@ -24,36 +24,31 @@ public class Server {
          portBase = 9090;
          System.out.println("Server started!");
          try(ServerSocket serverSocket = new ServerSocket(portBase)){
-         while(true) {
-             try {//redirection des connection
+             while(true) {
+                 try {//redirection des connection
 
-                 Socket s = serverSocket.accept();
-                 System.out.println("un client est là");
-                 //DataInputStream is = new DataInputStream(s.getInputStream());
-                 DataOutputStream os = new DataOutputStream(s.getOutputStream());
-                 //while(i<nbPlayers){
-                 //in = is.readUTF();
-                 //System.out.println(in);
-                 //os.writeUTF(out);
-                 //os.flush();
-                 if (i % nbPlayers == 0) {
-                     i = 0;
-                     port++;
-                     Room newRoom = new Room(port);
-                     newRoom.start();
-                     //System.out.println("coucou");
-                     sleep(500);
+                     Socket s = serverSocket.accept();
+                     System.out.println("un client est là");
+                     //DataInputStream is = new DataInputStream(s.getInputStream());
+                     DataOutputStream os = new DataOutputStream(s.getOutputStream());
+                     if (i % nbPlayers == 0) {
+                         i = 0;
+                         port++;
+                         Room newRoom = new Room(port);
+                         newRoom.start();
+                         //System.out.println("coucou");
+                         sleep(500);
+                     }
+                     System.out.println(port);
+                     os.writeInt(port);
+                     os.flush();
+                     i++;
+
+                     // }
+                 } catch (IOException e) {
+                     e.printStackTrace();
                  }
-                 System.out.println(port);
-                 os.writeInt(port);
-                 os.flush();
-                 i++;
-
-                 // }
-             } catch (IOException e) {
-                 e.printStackTrace();
              }
-         }
          }
          catch (IOException e){
              e.printStackTrace();

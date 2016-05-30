@@ -55,4 +55,9 @@ public class Paquet implements Serializable{
     public void setPosY(int posY) {
         this.posY = posY;
     }
+
+    public String toString() {
+        return "PersoID: " + persoID + " ActionID: " + actionID + " posX: " + posX + " posY: " + posY;
+    }
+
 }
