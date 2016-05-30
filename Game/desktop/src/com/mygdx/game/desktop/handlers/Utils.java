@@ -17,11 +17,11 @@ public class Utils {
     public static final int SCALE = 2;
 
     //Player properties
-    public static final int PLAYER_SIZE = 5;
+    public static final int PLAYER_SIZE = 4;
     public static final int PLAYER_DENSITY = 100;
     public static final float PLAYER_RESTITUTION = 0.0f;
-    public static final float PLAYER_FRICTION = 0.1f;
+    public static final float PLAYER_FRICTION = 0.2f;
     public static final int PLAYER_JUMP_FORCE = 200;
-    public static final float PLAYER_ACCELERATION = 0.15f;
-    public static final float PLAYER_MAX_SPEED = 3.0f;
+    public static final float PLAYER_ACCELERATION = 0.11f;
+    public static final float PLAYER_MAX_SPEED = 2.5f;
 }

@@ -45,6 +45,7 @@ public class Player {
 
     public void jumpUp(int force) {
         playerBody.applyForceToCenter(0, force, true);
+        System.out.println(force);
     }
 
     public void moveOnSide(boolean moveRight, float acceleration) {

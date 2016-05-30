@@ -3,6 +3,7 @@ package com.mygdx.game.desktop.main;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.desktop.handlers.Utils;
 import com.mygdx.game.desktop.handlers.GameStateManager;
@@ -25,6 +26,8 @@ public class Game implements ApplicationListener{
     private GameStateManager gsm;
 
     public void create() {
+
+        //Texture.setEnforcePotImages(false);
 
         Gdx.input.setInputProcessor(new MyInputProcessor());
 
