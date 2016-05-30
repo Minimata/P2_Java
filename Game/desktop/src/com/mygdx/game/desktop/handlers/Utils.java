@@ -18,10 +18,15 @@ public class Utils {
 
     //Player properties
     public static final int PLAYER_SIZE = 4;
-    public static final int PLAYER_DENSITY = 100;
-    public static final float PLAYER_RESTITUTION = 0.0f;
     public static final float PLAYER_FRICTION = 0.2f;
+
     public static final int PLAYER_JUMP_FORCE = 200;
+    public static final int PLAYER_JUMP_FORCE_DOUBLE_JUMP = 100;
+    public static final int PLAYER_SHOOT_DOWN_FORCE = 200;
+    public static final int PLAYER_KNOCK_BACK_FORCE = 100;
+    public static final int PLAYER_DAMAGE = 20;
+    public static final int PLAYER_TIMER_HIT = 20;
+
     public static final float PLAYER_ACCELERATION = 0.11f;
     public static final float PLAYER_MAX_SPEED = 2.5f;
 }

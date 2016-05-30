@@ -8,10 +8,12 @@ public class MyInput {
     public static boolean[] keys;
     public static boolean[] pkeys;
 
-    public static final int NUM_KEYS = 3;
+    public static final int NUM_KEYS = 5;
     public static final int BUTTON_JUMP = 0;
     public static final int BUTTON_RIGHT = 1;
     public static final int BUTTON_LEFT = 2;
+    public static final int BUTTON_SHOOT_DOWN = 3;
+    public static final int BUTTON_HIT = 4;
 
     static {
         keys = new boolean[NUM_KEYS];
@@ -32,5 +34,4 @@ public class MyInput {
     public static boolean isPressed(int i) {
         return keys[i] && !pkeys[i];
     }
-
 }

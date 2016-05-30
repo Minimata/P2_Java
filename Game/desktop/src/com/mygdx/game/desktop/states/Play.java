@@ -30,6 +30,7 @@ public class Play extends GameState {
     private MyContactListener cl;
 
     private Player player;
+    private Player player2;
 
     private TiledMap tileMap;
     private OrthoCachedTiledMapRenderer tmr;
@@ -59,6 +60,7 @@ public class Play extends GameState {
 
         //create Player
         player = new Player(world);
+        player2 = new Player(world);
 
         //set up box2d cam
         b2dcam = new OrthographicCamera();
@@ -122,19 +124,34 @@ public class Play extends GameState {
         if (MyInput.isPressed(MyInput.BUTTON_JUMP)) {
             if (cl.isPlayerOnGround()) player.jumpUp(Utils.PLAYER_JUMP_FORCE);
             else if (cl.canPlayerDoubleJump()) {
-                player.jumpUp(Utils.PLAYER_JUMP_FORCE / 2);
+                player.jumpUp(Utils.PLAYER_JUMP_FORCE_DOUBLE_JUMP);
                 cl.setDoubleJump(false);
             }
+        }
+
+        //player shoot down
+        if(MyInput.isPressed(MyInput.BUTTON_SHOOT_DOWN)) {
+            if(!(cl.isPlayerOnGround())) player.shootDown(Utils.PLAYER_SHOOT_DOWN_FORCE);
         }
 
         //player straf
         if (MyInput.isDown(MyInput.BUTTON_RIGHT)) player.moveOnSide(true, Utils.PLAYER_ACCELERATION);
         if (MyInput.isDown(MyInput.BUTTON_LEFT)) player.moveOnSide(false, Utils.PLAYER_ACCELERATION);
+
+        //player hit
+        if(MyInput.isPressed(MyInput.BUTTON_HIT)) {
+            if(MyInput.isDown(MyInput.BUTTON_LEFT)) {
+                player.hit(-1);
+            }
+            else if (MyInput.isDown(MyInput.BUTTON_RIGHT)) {
+                player.hit(1);
+            }
+            else player.hit(0);
+        }
     }
 
     public void update(float dt) {
         handleInput();
-
         world.step(dt, 6, 2);
     }
 
@@ -145,6 +162,8 @@ public class Play extends GameState {
         //draw tilemap
         tmr.setView(cam);
         tmr.render();
+
+        player.decreaseHitTimer();
 
         //draw world
         b2dr.render(world, b2dcam.combined);
