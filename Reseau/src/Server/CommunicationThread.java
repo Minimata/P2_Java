@@ -1,6 +1,8 @@
+package Server;
+
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
+import CommunicationPaquet.Paquet;
 
 public class CommunicationThread extends Thread{
 
@@ -19,11 +21,12 @@ public class CommunicationThread extends Thread{
         boolean running = true;
         System.out.println("client dans la salle");
         try{
-            ois = new ObjectInputStream(socket.getInputStream());
+            //ois = new ObjectInputStream(socket.getInputStream());
             while(running){
                 //..... envoi et réception des données
 
                 //oos = new ObjectOutputStream(socket.getOutputStream());
+                ois = new ObjectInputStream(socket.getInputStream());
                 paquet = (Paquet) ois.readObject();
                 myRoom.setPaquet(paquet);
                 System.out.println(paquet.toString());

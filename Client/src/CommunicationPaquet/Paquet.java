@@ -1,17 +1,18 @@
+package CommunicationPaquet;
+
 import java.io.Serializable;
 
 /**
- * Created by steve.nadalin on 18/04/2016.
+ * Created by nicolas on 12.06.16.
  */
 public class Paquet implements Serializable{
-
     private short persoID;
     private short actionID;
     private int posX;
     private int posY;
+    static  final long serialVersionUID = 1234567899L;
 
     public Paquet(){
-        //test
         persoID = 1;
         actionID = 2;
         posX = 2;
@@ -56,8 +57,7 @@ public class Paquet implements Serializable{
         this.posY = posY;
     }
 
-    public String toString() {
+    public String toString(){
         return "PersoID: " + persoID + " ActionID: " + actionID + " posX: " + posX + " posY: " + posY;
     }
-
 }

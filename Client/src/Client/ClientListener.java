@@ -1,7 +1,10 @@
+package Client;
+
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import CommunicationPaquet.Paquet;
 
 /**
  * Created by nicolas on 11.04.16.
@@ -20,14 +23,16 @@ public class ClientListener extends Thread {
         System.out.println("Creation du listener ! ");
         socket = s;
         host = "localhost";
-        port = 9090;
+        port = 8080;
     }
 
     public void run() {
-        try {
-            System.out.println("Listener started");
+        listen();
+    }
 
-            while (infiniteLoop) {
+    public synchronized void listen(){
+        while(infiniteLoop){
+            try{
                 //DataInputStream scanner = new DataInputStream(socket.getInputStream());
                 //order = scanner.readUTF();
                 scanner = new ObjectInputStream(socket.getInputStream());
@@ -36,11 +41,11 @@ public class ClientListener extends Thread {
                 System.out.println(order.toString());
                 //System.out.println(order);
                 //infiniteLoop = false;
+            }catch(ClassNotFoundException e){
+                e.printStackTrace();
+            }catch(IOException e){
+                e.printStackTrace();
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

@@ -1,10 +1,10 @@
+package Client;
+
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
-
-import static java.lang.Thread.sleep;
+import CommunicationPaquet.Paquet;
 
 /**
  * Created by nicolas on 11.04.16.
@@ -12,7 +12,7 @@ import static java.lang.Thread.sleep;
 public class Main {
 
     private static String host;
-    private static final int portbase = 9090;
+    private static final int portbase = 8080;
     private static int port;
 
     public static void main(String[] args) {
