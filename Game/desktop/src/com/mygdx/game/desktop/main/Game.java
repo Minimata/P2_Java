@@ -5,10 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.desktop.handlers.Utils;
-import com.mygdx.game.desktop.handlers.GameStateManager;
-import com.mygdx.game.desktop.handlers.MyInput;
-import com.mygdx.game.desktop.handlers.MyInputProcessor;
+import com.mygdx.game.desktop.handlers.*;
 
 /**
  * Created by alexandre on 09.05.2016.

@@ -5,16 +5,16 @@ import static com.mygdx.game.desktop.handlers.Utils.PPM;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthoCachedTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.mygdx.game.desktop.handlers.Utils;
-import com.mygdx.game.desktop.handlers.GameStateManager;
-import com.mygdx.game.desktop.handlers.MyContactListener;
-import com.mygdx.game.desktop.handlers.MyInput;
+import com.mygdx.game.desktop.handlers.*;
 import com.mygdx.game.desktop.main.Player;
 
 /**
@@ -30,13 +30,18 @@ public class Play extends GameState {
     private MyContactListener cl;
 
     private Player player;
-    private Player player2;
+
+    private Content res;
 
     private TiledMap tileMap;
     private OrthoCachedTiledMapRenderer tmr;
     private float tileSize;
 
     private float offset;
+
+    private Texture backTex;
+    private Sprite backSprite;
+    private SpriteBatch backBatch;
 
     public Play(GameStateManager gsm) {
 
@@ -60,11 +65,15 @@ public class Play extends GameState {
 
         //create Player
         player = new Player(world);
-        player2 = new Player(world);
 
         //set up box2d cam
         b2dcam = new OrthographicCamera();
         b2dcam.setToOrtho(false, Utils.V_WIDTH / PPM, Utils.V_HEIGHT / PPM);
+
+        backTex = new Texture("res/images/background3.png");
+        backSprite = new Sprite(backTex);
+
+        res = new Content();
     }
 
     private void levelCreation() {
@@ -153,20 +162,31 @@ public class Play extends GameState {
     public void update(float dt) {
         handleInput();
         world.step(dt, 6, 2);
+        player.update(cl);
     }
 
     public void render() {
         //clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        sb.setProjectionMatrix(hudCam.combined);
+        sb.begin();
+        sb.draw(backSprite, 0, 0, Utils.V_WIDTH, Utils.V_HEIGHT);
+        sb.end();
+
         //draw tilemap
         tmr.setView(cam);
         tmr.render();
 
-        player.decreaseHitTimer();
-
         //draw world
         b2dr.render(world, b2dcam.combined);
+
+        sb.begin();
+        sb.draw((player.getCurrentImage()), (player.pos().x) * Utils.PPM - Utils.PLAYER_SIZE - 5,
+                (player.pos().y) * Utils.PPM - 2*Utils.PLAYER_SIZE - 3,
+                player.getCurrentImage().getWidth() / 1.5f,
+                player.getCurrentImage().getHeight() / 1.5f);
+        sb.end();
     }
 
     public void dispose() {
