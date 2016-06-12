@@ -38,7 +38,7 @@ public class ClientSender extends Thread{
         while(infiniteLoop){
             try{
                 //DataOutputStream writer = new DataOutputStream(socket.getOutputStream());
-                if(i == 0){
+                while(i < 2){
                     writer = new ObjectOutputStream(socket.getOutputStream());
                     writer.writeObject(p);
                     writer.flush();

@@ -12,10 +12,11 @@ import CommunicationPaquet.Paquet;
  */
 public class Room extends Thread{
 
-    private Collection<ObjectOutputStream> outStreams = new LinkedList<>();
+    private Collection<Socket> outSocket = new LinkedList<>();
     protected LinkedList<Paquet> toSend = new LinkedList<>();
     public static ServerSocket sSocket;
     private int port;
+    private ObjectOutputStream oos;
 
     public Room(int port){
         this.port = port;
@@ -26,8 +27,9 @@ public class Room extends Thread{
             Paquet paquetToSend = toSend.getFirst();
             toSend.removeFirst();
             System.out.println("envoi depuis la room: "+paquetToSend.toString());
-            for(ObjectOutputStream oos : outStreams){
+            for(Socket socket : outSocket){
                 try{
+                    oos = new ObjectOutputStream(socket.getOutputStream());
                     oos.writeObject(paquetToSend);
                     oos.flush();
                 }catch(IOException e){
@@ -52,7 +54,7 @@ public class Room extends Thread{
                     if(i<Server.nbPlayers){
                         //System.out.println("passe");
                         Socket socket = sSocket.accept();
-                        outStreams.add(new ObjectOutputStream(socket.getOutputStream()));
+                        outSocket.add(socket);
                         Thread t = new CommunicationThread(socket,this);
                         t.start();
                         i++;

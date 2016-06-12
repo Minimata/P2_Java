@@ -11,19 +11,14 @@ import CommunicationPaquet.Paquet;
  */
 public class ClientListener extends Thread {
 
-    private String host;
-    private int port;
     private boolean infiniteLoop = true;
     private Paquet order;
-    //private String order;
     private Socket socket;
     private ObjectInputStream scanner;
 
     public ClientListener(Socket s){
         System.out.println("Creation du listener ! ");
         socket = s;
-        host = "localhost";
-        port = 8080;
     }
 
     public void run() {
@@ -33,14 +28,9 @@ public class ClientListener extends Thread {
     public synchronized void listen(){
         while(infiniteLoop){
             try{
-                //DataInputStream scanner = new DataInputStream(socket.getInputStream());
-                //order = scanner.readUTF();
                 scanner = new ObjectInputStream(socket.getInputStream());
                 order = (Paquet) scanner.readObject();
-                //scanner.close();
                 System.out.println(order.toString());
-                //System.out.println(order);
-                //infiniteLoop = false;
             }catch(ClassNotFoundException e){
                 e.printStackTrace();
             }catch(IOException e){
