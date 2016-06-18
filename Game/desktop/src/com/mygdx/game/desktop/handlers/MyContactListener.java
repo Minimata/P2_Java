@@ -2,15 +2,31 @@ package com.mygdx.game.desktop.handlers;
 
 import com.badlogic.gdx.physics.box2d.*;
 
+import java.util.ArrayList;
+
 /**
  * Created by alexandre on 17.05.2016.
+ * This class keeps track of all player contacts in the scene.
  */
 public class MyContactListener implements ContactListener {
 
-    private boolean isOnGround;
-    private boolean canDoubleJump;
+    private boolean[] playerOnGround;
+    private boolean[] playerCanDoubleJump;
 
-    //called when 2 fixtures start to collide together
+    public MyContactListener() {
+        playerOnGround = new boolean[Utils.MAX_NUMBER_PLAYERS];
+        playerCanDoubleJump = new boolean[Utils.MAX_NUMBER_PLAYERS];
+
+        for(int i = 0; i < Utils.MAX_NUMBER_PLAYERS; i++) {
+            playerCanDoubleJump[i] = true;
+            playerOnGround[i] = false;
+        }
+    }
+
+    /**
+     * called when to fixtures collide together.
+     * @param c
+     */
     public void beginContact(Contact c) {
         Fixture fa = c.getFixtureA();
         Fixture fb = c.getFixtureB();
@@ -30,44 +46,65 @@ public class MyContactListener implements ContactListener {
         leavesGround(fb);
     }
 
+    /**
+     * checks if 2 fixtures colliding are actually one player hitting another, and applying force to the one getting hit.
+     * @param f fixture of the player hitting
+     * @param target fixture of the target of the assault.
+     */
     private void touchesPlayer(Fixture f, Fixture target) {
         if (f.getUserData() != null) {
-            if(f.getUserData().equals("onhit_UP")){
+            String userData = f.getUserData().toString().split("-")[1];
+            if(userData.equals("onhit_UP")){
                 target.getBody().applyForceToCenter(0, Utils.PLAYER_KNOCK_BACK_FORCE, true);
-                System.out.println("Force applied to UP");
             }
-            else if (f.getUserData().equals("onhit_RIGHT")){
+            else if (userData.equals("onhit_RIGHT")){
                 target.getBody().applyForceToCenter(Utils.PLAYER_KNOCK_BACK_FORCE, 0, true);
-                System.out.println("Force applied to RIGHT");
             }
-            else if (f.getUserData().equals("onhit_LEFT")){
+            else if (userData.equals("onhit_LEFT")){
                 target.getBody().applyForceToCenter(-Utils.PLAYER_KNOCK_BACK_FORCE, 0, true);
-                System.out.println("Force applied to LEFT");
             }
         }
     }
 
+    /**
+     * check if the player making the collision touches the ground.
+     * @param f fixture creating the collision.
+     */
     private void touchesGround(Fixture f) {
-        if (f.getUserData() != null && f.getUserData().equals("foot")){
-            isOnGround = true;
-            canDoubleJump = true;
+        if (f.getUserData() != null) {
+            String[] data = f.getUserData().toString().split("-");
+            int playerNum = Integer.parseInt(data[0]);
+            String userData = data[1];
+            if(userData.equals("foot")){
+                playerCanDoubleJump[playerNum] = true;
+                playerOnGround[playerNum] = true;
+            }
         }
     }
 
+    /**
+     * checks if a fixture is a player leaving ground.
+     * @param f the fixture creating the collision.
+     */
     private void leavesGround(Fixture f) {
-        if (f.getUserData() != null && f.getUserData().equals("foot")){
-            isOnGround = false;
+        if (f.getUserData() != null) {
+            String[] data = f.getUserData().toString().split("-");
+            int playerNum = Integer.parseInt(data[0]);
+            String userData = data[1];
+            if(userData.equals("foot")){
+                playerOnGround[playerNum] = false;
+            }
         }
     }
 
-    public boolean isPlayerOnGround(){
-        return isOnGround;
+    public boolean isPlayerOnGround(int playerNumber){
+        return playerOnGround[playerNumber];
     }
-    public boolean canPlayerDoubleJump() {
-        return canDoubleJump;
+    public boolean canPlayerDoubleJump(int playerNumber) {
+        return playerCanDoubleJump[playerNumber];
     }
-    public void setDoubleJump(boolean in) {
-        canDoubleJump = in;
+    public void setDoubleJump(int playerNumber, boolean in) {
+        playerCanDoubleJump[playerNumber] = in;
     }
 
     public void preSolve(Contact c, Manifold m) {}

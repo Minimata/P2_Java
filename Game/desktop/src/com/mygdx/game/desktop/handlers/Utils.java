@@ -29,4 +29,12 @@ public class Utils {
 
     public static final float PLAYER_ACCELERATION = 0.11f;
     public static final float PLAYER_MAX_SPEED = 2.5f;
+
+    public static final int MAX_NUMBER_PLAYERS = 2;
+
+    public static final int JUMP_CODE = 1;
+    public static final int SHOOT_DOWN_CODE = 2;
+    public static final int RIGHT_CODE = 3;
+    public static final int LEFT_CODE = 4;
+    public static final int HIT_CODE = 5;
 }

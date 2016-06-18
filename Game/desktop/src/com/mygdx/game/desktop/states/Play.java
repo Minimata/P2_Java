@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -16,66 +15,79 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.game.desktop.handlers.*;
 import com.mygdx.game.desktop.main.Player;
+import com.mygdx.game.desktop.CommunicationPaquet.*;
+import java.util.ArrayList;
 
 /**
  * Created by alexandre on 09.05.2016.
+ * This class implements the GameState during which the game really happens, with fighting and all.
+ * This is currently the only state implemented.
  */
 public class Play extends GameState {
 
+    //NETWORK
+    private Network network;
+
+    //WORLD
     private World world;
     private Box2DDebugRenderer b2dr;
-
     private OrthographicCamera b2dcam;
 
+    //PLAYERS
+    private ArrayList<Player> players;
     private MyContactListener cl;
 
-    private Player player;
-
-    private Content res;
-
+    //LEVEL
     private TiledMap tileMap;
     private OrthoCachedTiledMapRenderer tmr;
     private float tileSize;
-
     private float offset;
-
     private Texture backTex;
     private Sprite backSprite;
-    private SpriteBatch backBatch;
 
+    /**
+     * GameState Play constructor.
+     * @param gsm useful for changing GameStates (menu, pause or play states for exemple).
+     *            Here, Play is the only GameState at this stage.
+     */
     public Play(GameStateManager gsm) {
 
         super(gsm);
 
+        //NETWORK
+        network = new Network();
+
+        //WORLD
         world = new World(new Vector2(0, -9.81f), true);
         cl = new MyContactListener();
         world.setContactListener(cl);
-
         b2dr = new Box2DDebugRenderer();
 
-        // Load tile map
+        //LEVEL
         tileMap = new TmxMapLoader().load("res/maps/Arena.tmx");
         tmr = new OrthoCachedTiledMapRenderer(tileMap);
-
         TiledMapTileLayer layer = (TiledMapTileLayer) tileMap.getLayers().get("Platforms");
         tileSize = layer.getTileWidth(); //square
         offset = tileSize / 2;
-
-        levelCreation();
-
-        //create Player
-        player = new Player(world);
-
-        //set up box2d cam
-        b2dcam = new OrthographicCamera();
-        b2dcam.setToOrtho(false, Utils.V_WIDTH / PPM, Utils.V_HEIGHT / PPM);
-
         backTex = new Texture("res/images/background3.png");
         backSprite = new Sprite(backTex);
 
-        res = new Content();
+        levelCreation();
+
+        //PLAYERS
+        players = new ArrayList<Player>(Utils.MAX_NUMBER_PLAYERS);
+        for(int i = 0; i < Utils.MAX_NUMBER_PLAYERS; i++) {
+            players.add(i, new Player(world, i));
+        }
+
+        //CAMERA
+        b2dcam = new OrthographicCamera();
+        b2dcam.setToOrtho(false, Utils.V_WIDTH / PPM, Utils.V_HEIGHT / PPM);
     }
 
+    /**
+     * Creates level.
+     */
     private void levelCreation() {
         //create World walls
         createPlatform(Utils.V_WIDTH / 2, offset, Utils.V_WIDTH, tileSize); //GROUND
@@ -112,6 +124,13 @@ public class Play extends GameState {
         createPlatform(Utils.V_WIDTH - tileSize - 17 * tileSize + offset, 14 * tileSize + offset, tileSize, 3 * tileSize);
     }
 
+    /**
+     * Create a platform with given height and width at given position.
+     * @param x position on the x axis
+     * @param y position on the y axis
+     * @param w width of the platform
+     * @param h height of the platform
+     */
     private void createPlatform(float x, float y, float w, float h) {
         BodyDef bdef = new BodyDef();
         bdef.type = BodyDef.BodyType.StaticBody;
@@ -128,43 +147,73 @@ public class Play extends GameState {
         world.createBody(bdef).createFixture(fdef);
     }
 
-    public void handleInput() {
-        //player jump
-        if (MyInput.isPressed(MyInput.BUTTON_JUMP)) {
-            if (cl.isPlayerOnGround()) player.jumpUp(Utils.PLAYER_JUMP_FORCE);
-            else if (cl.canPlayerDoubleJump()) {
+    /**
+     * This function will go trough all packages received since last call and will feed it to every player input.
+     */
+    private void handleAllInputs() {
+        for (Paquet paquet : network.getPaquetsReceived()) {
+            for(Player player : players) {
+                handleInput(player, paquet);
+            }
+        }
+        network.emptyPaquets();
+    }
+
+    /**
+     * This function feeds the package to the player so it can plays the inputs correctly, depending on what the server is sending.
+     * @param player the player reading the package.
+     * @param paquet the package containing the input infos.
+     */
+    public void handleInput(Player player, Paquet paquet) {
+        //sets player position in the scene.
+        player.setPos(paquet.getPos());
+
+
+        if (paquet.playerJump(player.getPlayerNumber())) {
+            if (cl.isPlayerOnGround(player.getPlayerNumber())) player.jumpUp(Utils.PLAYER_JUMP_FORCE);
+            else if (cl.canPlayerDoubleJump(player.getPlayerNumber())) {
                 player.jumpUp(Utils.PLAYER_JUMP_FORCE_DOUBLE_JUMP);
-                cl.setDoubleJump(false);
+                cl.setDoubleJump(player.getPlayerNumber(), false);
             }
         }
 
         //player shoot down
-        if(MyInput.isPressed(MyInput.BUTTON_SHOOT_DOWN)) {
-            if(!(cl.isPlayerOnGround())) player.shootDown(Utils.PLAYER_SHOOT_DOWN_FORCE);
+        if(paquet.playerShootDown(player.getPlayerNumber())) {
+            if(!(cl.isPlayerOnGround(player.getPlayerNumber()))) player.shootDown(Utils.PLAYER_SHOOT_DOWN_FORCE);
         }
 
         //player straf
-        if (MyInput.isDown(MyInput.BUTTON_RIGHT)) player.moveOnSide(true, Utils.PLAYER_ACCELERATION);
-        if (MyInput.isDown(MyInput.BUTTON_LEFT)) player.moveOnSide(false, Utils.PLAYER_ACCELERATION);
+        if (paquet.playerRight(player.getPlayerNumber())) player.moveOnSide(true, Utils.PLAYER_ACCELERATION);
+        if (paquet.playerLeft(player.getPlayerNumber())) player.moveOnSide(false, Utils.PLAYER_ACCELERATION);
 
         //player hit
-        if(MyInput.isPressed(MyInput.BUTTON_HIT)) {
-            if(MyInput.isDown(MyInput.BUTTON_LEFT)) {
+        if(paquet.playerHit(player.getPlayerNumber())) {
+            if(paquet.playerLeft(player.getPlayerNumber())) {
                 player.hit(-1);
             }
-            else if (MyInput.isDown(MyInput.BUTTON_RIGHT)) {
+            else if (paquet.playerRight(player.getPlayerNumber())) {
                 player.hit(1);
             }
             else player.hit(0);
         }
     }
 
+    /**
+     * Function called every frame for the libgdx GameLoop.
+     * This will make the world "move" int ime and will handle inputs as well as calling the update of its moving children (meaning the players).
+     * @param dt delta time since last call.
+     */
     public void update(float dt) {
-        handleInput();
         world.step(dt, 6, 2);
-        player.update(cl);
+        handleAllInputs();
+        for(Player player : players) {
+            player.update(cl);
+        }
     }
 
+    /**
+     * This function will display the textures and sprite on the window.
+     */
     public void render() {
         //clear screen
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -182,13 +231,19 @@ public class Play extends GameState {
         b2dr.render(world, b2dcam.combined);
 
         sb.begin();
-        sb.draw((player.getCurrentImage()), (player.pos().x) * Utils.PPM - Utils.PLAYER_SIZE - 5,
-                (player.pos().y) * Utils.PPM - 2*Utils.PLAYER_SIZE - 3,
-                player.getCurrentImage().getWidth() / 1.5f,
-                player.getCurrentImage().getHeight() / 1.5f);
+
+        for(Player player : players) {
+            sb.draw((player.getCurrentImage()), (player.pos().x) * Utils.PPM - Utils.PLAYER_SIZE - 5,
+                    (player.pos().y) * Utils.PPM - 2*Utils.PLAYER_SIZE - 3,
+                    player.getCurrentImage().getWidth() / 1.5f,
+                    player.getCurrentImage().getHeight() / 1.5f);
+        }
         sb.end();
     }
 
+    /**
+     * Used to destroy the scene and window and everything. Not implemented here yet.
+     */
     public void dispose() {
 
     }
