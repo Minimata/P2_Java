@@ -168,7 +168,6 @@ public class Play extends GameState {
         //sets player position in the scene.
         player.setPos(paquet.getPos());
 
-
         if (paquet.playerJump(player.getPlayerNumber())) {
             if (cl.isPlayerOnGround(player.getPlayerNumber())) player.jumpUp(Utils.PLAYER_JUMP_FORCE);
             else if (cl.canPlayerDoubleJump(player.getPlayerNumber())) {

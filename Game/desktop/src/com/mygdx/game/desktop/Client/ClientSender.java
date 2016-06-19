@@ -24,17 +24,14 @@ public class ClientSender {
 
     /**
      * Sends a package to the server.
+     *
      * @param p the package to be sent.
      */
     public void send(Paquet p) {
-        int i = 0;
         try {
-            while (i < 2) {
-                ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
-                writer.writeObject(p);
-                writer.flush();
-                i++;
-            }
+            ObjectOutputStream writer = new ObjectOutputStream(socket.getOutputStream());
+            writer.writeObject(p);
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

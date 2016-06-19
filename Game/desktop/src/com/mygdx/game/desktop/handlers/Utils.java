@@ -37,4 +37,7 @@ public class Utils {
     public static final int RIGHT_CODE = 3;
     public static final int LEFT_CODE = 4;
     public static final int HIT_CODE = 5;
+
+
+    public static final int PORTBASE = 8080;
 }
