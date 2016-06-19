@@ -14,7 +14,7 @@ public class Main {
     /*
 
     private static String host;
-    private static final int PORTBASE = 8080;
+    private static final int portbase = 8080;
     private static int port;
 
     public static void main(String[] args) {
@@ -30,7 +30,7 @@ public class Main {
         System.out.println("Entrez l'adresse ip du serveur: ");
         host = scan.nextLine();
         try{
-            Socket sock = new Socket(host, PORTBASE);
+            Socket sock = new Socket(host, portbase);
             DataInputStream scanner = new DataInputStream(sock.getInputStream());
             port = scanner.readInt();
             System.out.println(port);

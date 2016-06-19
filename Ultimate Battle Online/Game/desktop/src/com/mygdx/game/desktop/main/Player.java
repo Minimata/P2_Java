@@ -34,11 +34,12 @@ public class Player {
      * Player Constructor
      * @param world the world in which the player is added, so it can add itself to it.
      * @param playerNum the ID of the player, going from 0 to Utils.MAX_NUMBER_PLAYER (as written in Play.java).
+     * @param net the network of the game.
      */
-    public Player(World world, int playerNum) {
+    public Player(World world, int playerNum, Network net) {
 
         //NETWORK
-        network = new Network();
+        network = net;
 
         //LOGIC
         playerNumber = playerNum;

@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.mygdx.game.desktop.CommunicationPaquet.Paquet;
 
@@ -15,11 +19,12 @@ import com.mygdx.game.desktop.CommunicationPaquet.Paquet;
 public class ClientListener extends Thread {
 
     private Socket socket;
+    private ReentrantReadWriteLock lock;
 
     /**
      * CAREFUL : this might be critical resources, and it is taken each frame by a non.threaded class.
      */
-    private ArrayList<Paquet> paquetsReceived;
+    private ArrayList<Paquet> paquetsReceived = new ArrayList<Paquet>();
 
     /**
      * Constructor of the listener.
@@ -28,6 +33,7 @@ public class ClientListener extends Thread {
     public ClientListener(Socket s){
         System.out.println("Creation du listener ! ");
         socket = s;
+        lock = new ReentrantReadWriteLock();
     }
 
     public void run() {
@@ -42,8 +48,10 @@ public class ClientListener extends Thread {
             try{
                 ObjectInputStream scanner = new ObjectInputStream(socket.getInputStream());
                 Paquet order = (Paquet) scanner.readObject();
-                paquetsReceived.add(order);
-                System.out.println(order.toString());
+                if(order != null) {
+                    System.out.println(order.toString());
+                    paquetsReceived.add(order);
+                }
             }catch(ClassNotFoundException e){
                 e.printStackTrace();
             }catch(IOException e){
@@ -58,13 +66,24 @@ public class ClientListener extends Thread {
      * @return the list of packages.
      */
     public ArrayList<Paquet> getPaquetsReceived() {
-        return paquetsReceived;
+        try{
+            lock.readLock().lock();
+            return paquetsReceived;
+        }finally {
+            lock.readLock().unlock();
+        }
     }
 
     /**
      * Empties the package list when all have been read.
      */
     public void emptyPaquets() {
-        paquetsReceived.clear();
+        try{
+            lock.writeLock().lock();
+            paquetsReceived.clear();
+        }finally {
+            lock.writeLock().unlock();
+        }
+
     }
 }

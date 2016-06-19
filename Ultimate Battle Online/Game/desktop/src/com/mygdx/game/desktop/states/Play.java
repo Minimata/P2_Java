@@ -77,7 +77,7 @@ public class Play extends GameState {
         //PLAYERS
         players = new ArrayList<Player>(Utils.MAX_NUMBER_PLAYERS);
         for(int i = 0; i < Utils.MAX_NUMBER_PLAYERS; i++) {
-            players.add(i, new Player(world, i));
+            players.add(i, new Player(world, i, network));
         }
 
         //CAMERA
@@ -151,12 +151,17 @@ public class Play extends GameState {
      * This function will go trough all packages received since last call and will feed it to every player input.
      */
     private void handleAllInputs() {
-        for (Paquet paquet : network.getPaquetsReceived()) {
-            for(Player player : players) {
-                handleInput(player, paquet);
+        if (network.getPaquetsReceived() != null && !network.getPaquetsReceived().isEmpty()) {
+            System.out.println("If passed");
+            for (Paquet paquet : network.getPaquetsReceived()) {
+                System.out.println("new paquet treated");
+                for(Player player : players) {
+                    System.out.println("New player treated");
+                    handleInput(player, paquet);
+                }
             }
+            network.emptyPaquets();
         }
-        network.emptyPaquets();
     }
 
     /**
@@ -165,8 +170,11 @@ public class Play extends GameState {
      * @param paquet the package containing the input infos.
      */
     public void handleInput(Player player, Paquet paquet) {
-        //sets player position in the scene.
-        player.setPos(paquet.getPos());
+        /*sets player position in the scene.
+        this creates lag and other problems but is necessary to have a coherent state of the game.
+        */
+        //player.setPos(paquet.getPos());
+        System.out.println(paquet.toString());
 
         if (paquet.playerJump(player.getPlayerNumber())) {
             if (cl.isPlayerOnGround(player.getPlayerNumber())) player.jumpUp(Utils.PLAYER_JUMP_FORCE);

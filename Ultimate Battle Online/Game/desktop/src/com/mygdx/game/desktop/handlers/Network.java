@@ -20,6 +20,7 @@ public class Network {
     private ClientListener cListener;
     private ClientSender cSender;
     private static String host;
+    private static final int portbase = 8080;
     private static int port;
 
     public Network() {
@@ -45,7 +46,7 @@ public class Network {
         System.out.println("Entrez l'adresse ip du serveur: ");
         host = scan.nextLine();
         try{
-            Socket sock = new Socket(host, Utils.PORTBASE);
+            Socket sock = new Socket(host, portbase);
             DataInputStream scanner = new DataInputStream(sock.getInputStream());
             port = scanner.readInt();
             System.out.println(port);
