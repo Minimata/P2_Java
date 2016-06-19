@@ -16,6 +16,11 @@ public class Server {
     public static int portBase;
     public final static int nbPlayers = 2;
 
+    /**
+     * This is the server, it will instanciate one room for every game.
+     * @param args no args required
+     * @throws Exception for connections issues
+     */
      public static void main(String[] args) throws Exception{
 
          int i=0;

@@ -22,6 +22,9 @@ public class Room extends Thread{
         this.port = port;
     }
 
+    /**
+     * Send every paquet of the list to all players
+     */
     private void sendPaquet(){
         if(toSend.size()!=0){
             Paquet paquetToSend = toSend.getFirst();
@@ -39,10 +42,18 @@ public class Room extends Thread{
         }
     }
 
+    /**
+     * Sets the paquet to send to others players
+     * @param p paquet
+     */
     public synchronized void setPaquet(Paquet p){
         this.toSend.add(p);
     }
 
+    /**
+     * Connect players qith et communication thread and then
+     * sends every paquet received
+     */
     public void run(){
         String out = "connecté à la salle";
         int i = 0;

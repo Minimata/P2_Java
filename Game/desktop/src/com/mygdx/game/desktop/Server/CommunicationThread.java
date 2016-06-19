@@ -4,6 +4,9 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import com.mygdx.game.desktop.CommunicationPaquet.Paquet;
 
+/**
+ * Created by steve.nadalin on 11/04/2016.
+ */
 public class CommunicationThread extends Thread{
 
     private Socket socket;
@@ -14,6 +17,9 @@ public class CommunicationThread extends Thread{
         myRoom = r;
     }
 
+    /**
+     * listen a player and sets the paquet received into the room's paquet list.
+     */
     public void run(){
         ObjectInputStream ois;
         //ObjectOutputStream oos;
